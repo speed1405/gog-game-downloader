@@ -22,7 +22,7 @@ if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
 }
 
 $sdkMajors = @(
-    dotnet --list-sdks |
+    Invoke-Dotnet -Arguments @("--list-sdks") |
         ForEach-Object {
             if ($_ -match '^(\d+)\.') {
                 [int]$Matches[1]
