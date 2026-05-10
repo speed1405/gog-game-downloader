@@ -123,7 +123,7 @@ Expected behavior:
   - enter: slide-up + fade (`~250ms`)
   - dismiss: fade/slide-out
 - Notification policy:
-  - Success: auto-dismiss (4s)
+  - Success: auto-dismiss (4 s)
   - Error: persistent with retry action
 
 ---
@@ -138,7 +138,7 @@ Visual model:
 
 Data source:
 - `DriveInfo.GetDrives()` at startup and when opening storage settings
-- Periodic refresh every 30s for removable media changes
+- Periodic refresh every 30 s for removable media changes
 
 Bar segment semantics:
 - Blue: GOG backup data
@@ -225,7 +225,7 @@ AppSettings    (Key TEXT PK, Value TEXT)
 - Store checksum and error details for diagnostics
 
 ### Retention policy
-- Metadata refreshed asynchronously when stale (>24h)
+- Metadata refreshed asynchronously when stale (>24 h)
 - Poster cache retained until invalidated by source change
 - Download history retained; optional cleanup setting for old records
 
