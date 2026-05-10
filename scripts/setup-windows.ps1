@@ -21,8 +21,13 @@ if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     throw "dotnet SDK is required but was not found."
 }
 
+$sdkList = & dotnet --list-sdks
+if ($LASTEXITCODE -ne 0) {
+    throw "Failed to query installed .NET SDKs. Ensure the dotnet SDK is installed and working correctly."
+}
+
 $sdkMajors = @(
-    Invoke-Dotnet -Arguments @("--list-sdks") |
+    $sdkList |
         ForEach-Object {
             if ($_ -match '^(\d+)\.') {
                 [int]$Matches[1]
