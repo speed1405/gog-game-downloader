@@ -1,4 +1,6 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -15,7 +17,7 @@ public partial class StorageViewModel : ViewModelBase
     public StorageViewModel(IStorageService storageService)
     {
         _storageService = storageService;
-        _ = RefreshAsync();
+        _ = InitializeAsync();
     }
 
     [RelayCommand]
@@ -24,8 +26,10 @@ public partial class StorageViewModel : ViewModelBase
         var primaryPath = await _storageService.GetPrimaryDownloadPathAsync();
         var backupPath = await _storageService.GetBackupTargetPathAsync();
 
+        var drives = await Task.Run(() => _storageService.GetAvailableDrives());
+
         Drives.Clear();
-        foreach (var drive in _storageService.GetAvailableDrives())
+        foreach (var drive in drives)
         {
             Drives.Add(new DriveCardViewModel
             {
@@ -38,6 +42,18 @@ public partial class StorageViewModel : ViewModelBase
                 IsBackupTarget = !string.IsNullOrWhiteSpace(backupPath) &&
                                  backupPath.StartsWith(drive.RootPath, System.StringComparison.OrdinalIgnoreCase)
             });
+        }
+    }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            await RefreshAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to initialize storage page: {ex}");
         }
     }
 }

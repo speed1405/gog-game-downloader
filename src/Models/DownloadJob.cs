@@ -12,6 +12,7 @@ public enum DownloadStatus
     Paused,
     Verifying,
     Completed,
+    Canceled,
     Error,
     AuthRequired
 }

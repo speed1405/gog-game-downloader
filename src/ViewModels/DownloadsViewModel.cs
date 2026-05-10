@@ -1,4 +1,6 @@
+using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -19,7 +21,7 @@ public partial class DownloadsViewModel : ViewModelBase
     public DownloadsViewModel(IDownloadService downloadService)
     {
         _downloadService = downloadService;
-        _ = RefreshJobsAsync();
+        _ = InitializeAsync();
     }
 
     [RelayCommand]
@@ -79,6 +81,18 @@ public partial class DownloadsViewModel : ViewModelBase
         }
 
         IsIdle = Jobs.Count == 0;
+    }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            await RefreshJobsAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to initialize downloads page: {ex}");
+        }
     }
 }
 

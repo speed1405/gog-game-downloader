@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace GogGameDownloader.ViewModels;
 
 public partial class SettingsViewModel : ViewModelBase
 {
+    private const int MinConcurrentDownloads = 1;
+    private const int MaxConcurrentDownloadsLimit = 10;
+
     private readonly ISettingsRepository _settingsRepository;
     private readonly IStorageService _storageService;
 
@@ -34,12 +38,13 @@ public partial class SettingsViewModel : ViewModelBase
     {
         _settingsRepository = settingsRepository;
         _storageService = storageService;
-        _ = LoadAsync();
+        _ = InitializeAsync();
     }
 
     [RelayCommand]
     private async Task Save()
     {
+        MaxConcurrentDownloads = Math.Clamp(MaxConcurrentDownloads, MinConcurrentDownloads, MaxConcurrentDownloadsLimit);
         await _settingsRepository.SetValueAsync(AppSettingKeys.StartWithWindows, StartWithWindows.ToString(CultureInfo.InvariantCulture));
         await _settingsRepository.SetValueAsync(AppSettingKeys.MinimizeToTray, MinimizeToTray.ToString(CultureInfo.InvariantCulture));
         await _settingsRepository.SetValueAsync(AppSettingKeys.MaxConcurrentDownloads, MaxConcurrentDownloads.ToString(CultureInfo.InvariantCulture));
@@ -115,7 +120,19 @@ public partial class SettingsViewModel : ViewModelBase
         if (settings.TryGetValue(AppSettingKeys.MaxConcurrentDownloads, out var maxConcurrentDownloadsRaw) &&
             int.TryParse(maxConcurrentDownloadsRaw, out var maxConcurrentDownloads))
         {
-            MaxConcurrentDownloads = Math.Clamp(maxConcurrentDownloads, 1, 10);
+            MaxConcurrentDownloads = Math.Clamp(maxConcurrentDownloads, MinConcurrentDownloads, MaxConcurrentDownloadsLimit);
+        }
+    }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to initialize settings page: {ex}");
         }
     }
 }

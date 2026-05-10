@@ -72,8 +72,8 @@ public class DownloadService : IDownloadService
             return;
         }
 
-        job.Status = DownloadStatus.Error;
-        job.ErrorMessage = "Canceled by user";
+        job.Status = DownloadStatus.Canceled;
+        job.ErrorMessage = null;
         job.FinishedAt = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync(ct);
     }
@@ -84,7 +84,9 @@ public class DownloadService : IDownloadService
             .AsNoTracking()
             .Include(j => j.GameVersion)
             .ThenInclude(v => v!.Game)
-            .Where(j => j.Status != DownloadStatus.Completed && j.Status != DownloadStatus.Error)
+            .Where(j => j.Status != DownloadStatus.Completed &&
+                        j.Status != DownloadStatus.Error &&
+                        j.Status != DownloadStatus.Canceled)
             .OrderByDescending(j => j.StartedAt)
             .ThenByDescending(j => j.Id)
             .ToListAsync(ct);

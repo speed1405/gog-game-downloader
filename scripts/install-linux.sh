@@ -17,7 +17,7 @@ dotnet publish "${REPO_ROOT}/src/GogGameDownloader.csproj" \
 
 echo "Installing to ${INSTALL_DIR}..."
 mkdir -p "${INSTALL_DIR}" "${BIN_DIR}"
-rm -rf "${INSTALL_DIR:?}/"*
+find "${INSTALL_DIR}" -mindepth 1 -delete
 cp -a "${PUBLISH_DIR}/." "${INSTALL_DIR}/"
 
 cat > "${LAUNCHER_PATH}" <<'EOF'

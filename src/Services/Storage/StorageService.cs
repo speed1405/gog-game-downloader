@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using GogGameDownloader.Services.Settings;
 
@@ -83,25 +82,59 @@ public class StorageService : IStorageService
 
     private static long GetDirectorySizeSafe(string path)
     {
+        var total = 0L;
+        var pending = new Stack<string>();
+        pending.Push(path);
+
         try
         {
-            return Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories)
-                .Select(file =>
+            while (pending.Count > 0)
+            {
+                var current = pending.Pop();
+
+                IEnumerable<string> files;
+                try
+                {
+                    files = Directory.EnumerateFiles(current);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                foreach (var file in files)
                 {
                     try
                     {
-                        return new FileInfo(file).Length;
+                        total += new FileInfo(file).Length;
                     }
                     catch
                     {
-                        return 0L;
+                        // Ignore inaccessible files.
                     }
-                })
-                .Sum();
+                }
+
+                IEnumerable<string> directories;
+                try
+                {
+                    directories = Directory.EnumerateDirectories(current);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                foreach (var directory in directories)
+                {
+                    pending.Push(directory);
+                }
+            }
         }
         catch
         {
             return 0L;
         }
+
+        return total;
     }
 }
