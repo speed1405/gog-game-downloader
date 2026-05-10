@@ -1,11 +1,21 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GogGameDownloader.Services.Auth;
+using GogGameDownloader.Services.Library;
 
 namespace GogGameDownloader.ViewModels;
 
 public partial class LibraryViewModel : ViewModelBase
 {
+    private readonly IGameLibraryService _gameLibraryService;
+    private readonly IAuthService _authService;
+    private readonly List<GameCardViewModel> _allGames = new();
+
     [ObservableProperty]
     private string _searchText = string.Empty;
 
@@ -16,15 +26,91 @@ public partial class LibraryViewModel : ViewModelBase
 
     public bool IsEmpty => Games.Count == 0;
 
-    public LibraryViewModel()
+    public LibraryViewModel(IGameLibraryService gameLibraryService, IAuthService authService)
     {
+        _gameLibraryService = gameLibraryService;
+        _authService = authService;
+
         Games.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsEmpty));
+        _authService.AuthStateChanged += OnAuthStateChanged;
+
+        if (_authService.IsAuthenticated)
+        {
+            _ = RefreshAsync();
+        }
     }
 
     [RelayCommand]
-    private void Refresh()
+    private async Task RefreshAsync()
     {
-        // TODO: Phase 3 — fetch game catalog from GOG API and populate Games collection
+        if (IsLoading) return;
+
+        IsLoading = true;
+        try
+        {
+            var games = await _gameLibraryService.GetOwnedGamesAsync();
+            _allGames.Clear();
+            _allGames.AddRange(games
+                .OrderBy(g => g.Title, StringComparer.OrdinalIgnoreCase)
+                .Select(g => new GameCardViewModel
+                {
+                    GameId = g.GameId,
+                    Title = g.Title,
+                    PosterUrl = g.PosterUrl,
+                    StatusLabel = "Ready",
+                    SizeLabel = g.SizeBytes.HasValue ? FormatSize(g.SizeBytes.Value) : string.Empty,
+                    HasDownloadProgress = false,
+                    DownloadProgress = 0
+                }));
+
+            ApplyFilter();
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    partial void OnSearchTextChanged(string value) => ApplyFilter();
+
+    private void OnAuthStateChanged(object? sender, AuthUser? user)
+    {
+        if (user is null)
+        {
+            _allGames.Clear();
+            Games.Clear();
+            return;
+        }
+
+        _ = RefreshAsync();
+    }
+
+    private void ApplyFilter()
+    {
+        var search = SearchText.Trim();
+        var filtered = string.IsNullOrWhiteSpace(search)
+            ? _allGames
+            : _allGames.Where(g => g.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        Games.Clear();
+        foreach (var game in filtered)
+        {
+            Games.Add(game);
+        }
+    }
+
+    private static string FormatSize(long bytes)
+    {
+        string[] units = ["B", "KB", "MB", "GB", "TB"];
+        double size = bytes;
+        var unit = 0;
+        while (size >= 1024 && unit < units.Length - 1)
+        {
+            size /= 1024;
+            unit++;
+        }
+
+        return $"{size:0.#} {units[unit]}";
     }
 }
 
