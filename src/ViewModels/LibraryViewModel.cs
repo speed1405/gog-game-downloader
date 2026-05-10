@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -36,7 +37,7 @@ public partial class LibraryViewModel : ViewModelBase
 
         if (_authService.IsAuthenticated)
         {
-            _ = RefreshAsync();
+            _ = SafeRefreshAsync();
         }
     }
 
@@ -82,7 +83,7 @@ public partial class LibraryViewModel : ViewModelBase
             return;
         }
 
-        _ = RefreshAsync();
+        _ = SafeRefreshAsync();
     }
 
     private void ApplyFilter()
@@ -111,6 +112,18 @@ public partial class LibraryViewModel : ViewModelBase
         }
 
         return $"{size:0.#} {units[unit]}";
+    }
+
+    private async Task SafeRefreshAsync()
+    {
+        try
+        {
+            await RefreshAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to refresh library: {ex}");
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -9,17 +10,15 @@ using GogGameDownloader.Services.Auth;
 
 namespace GogGameDownloader.Services.Library;
 
-public class GogGameLibraryService : IGameLibraryService, IDisposable
+public class GogGameLibraryService : IGameLibraryService
 {
     private const string LibraryUrl = "https://embed.gog.com/user/data/games";
+    private static readonly HttpClient HttpClient = CreateHttpClient();
     private readonly IAuthService _authService;
-    private readonly HttpClient _httpClient;
 
     public GogGameLibraryService(IAuthService authService)
     {
         _authService = authService;
-        _httpClient = new HttpClient();
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", "GogGameDownloader/1.0");
     }
 
     public async Task<IReadOnlyList<OwnedGame>> GetOwnedGamesAsync(CancellationToken ct = default)
@@ -35,7 +34,7 @@ public class GogGameLibraryService : IGameLibraryService, IDisposable
 
         try
         {
-            using var response = await _httpClient.SendAsync(request, ct);
+            using var response = await HttpClient.SendAsync(request, ct);
             if (!response.IsSuccessStatusCode)
             {
                 return [];
@@ -43,6 +42,21 @@ public class GogGameLibraryService : IGameLibraryService, IDisposable
 
             var content = await response.Content.ReadAsStringAsync(ct);
             return ParseOwnedGames(content);
+        }
+        catch (HttpRequestException ex)
+        {
+            Debug.WriteLine($"Failed to load GOG library: {ex}");
+            return [];
+        }
+        catch (TaskCanceledException ex)
+        {
+            Debug.WriteLine($"GOG library request canceled/timed out: {ex}");
+            return [];
+        }
+        catch (JsonException ex)
+        {
+            Debug.WriteLine($"Failed to parse GOG library response: {ex}");
+            return [];
         }
         catch
         {
@@ -160,5 +174,10 @@ public class GogGameLibraryService : IGameLibraryService, IDisposable
         return null;
     }
 
-    public void Dispose() => _httpClient.Dispose();
+    private static HttpClient CreateHttpClient()
+    {
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("User-Agent", "GogGameDownloader/1.0");
+        return client;
+    }
 }
