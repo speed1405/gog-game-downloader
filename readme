@@ -13,6 +13,8 @@ Cross-platform desktop app for browsing your owned GOG titles, managing download
 
 ## Build
 
+Requires .NET SDK 10.0 or newer.
+
 ```bash
 dotnet build /absolute/path/to/gog-game-downloader/src/GogGameDownloader.csproj
 ```

@@ -9,12 +9,27 @@ $startMenuDir = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Go
 $shortcutPath = Join-Path $startMenuDir "GOG Game Downloader.lnk"
 $exePath = Join-Path $installDir "GogGameDownloader.exe"
 
+function Invoke-Dotnet {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Arguments
+    )
+
+    & dotnet @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet $($Arguments -join ' ') failed with exit code $LASTEXITCODE."
+    }
+}
+
 Write-Host "Publishing win-x64 build..."
-dotnet publish "$repoRoot\src\GogGameDownloader.csproj" `
-    -c Release `
-    -r win-x64 `
-    --self-contained false `
-    -o $publishDir
+Invoke-Dotnet @(
+    "publish",
+    "$repoRoot\src\GogGameDownloader.csproj",
+    "-c", "Release",
+    "-r", "win-x64",
+    "--self-contained", "false",
+    "-o", $publishDir
+)
 
 Write-Host "Installing to $installDir..."
 New-Item -ItemType Directory -Force -Path $installDir | Out-Null
