@@ -34,11 +34,6 @@ public partial class LibraryViewModel : ViewModelBase
 
         Games.CollectionChanged += (_, _) => OnPropertyChanged(nameof(IsEmpty));
         _authService.AuthStateChanged += OnAuthStateChanged;
-
-        if (_authService.IsAuthenticated)
-        {
-            _ = SafeRefreshAsync();
-        }
     }
 
     [RelayCommand]
@@ -74,7 +69,7 @@ public partial class LibraryViewModel : ViewModelBase
 
     partial void OnSearchTextChanged(string value) => ApplyFilter();
 
-    private void OnAuthStateChanged(object? sender, AuthUser? user)
+    private async void OnAuthStateChanged(object? sender, AuthUser? user)
     {
         if (user is null)
         {
@@ -83,7 +78,14 @@ public partial class LibraryViewModel : ViewModelBase
             return;
         }
 
-        _ = SafeRefreshAsync();
+        try
+        {
+            await RefreshAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to refresh library after auth change: {ex}");
+        }
     }
 
     private void ApplyFilter()
@@ -114,17 +116,6 @@ public partial class LibraryViewModel : ViewModelBase
         return $"{size:0.#} {units[unit]}";
     }
 
-    private async Task SafeRefreshAsync()
-    {
-        try
-        {
-            await RefreshAsync();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Failed to refresh library: {ex}");
-        }
-    }
 }
 
 public partial class GameCardViewModel : ViewModelBase

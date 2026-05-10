@@ -13,7 +13,13 @@ namespace GogGameDownloader.Services.Library;
 public class GogGameLibraryService : IGameLibraryService
 {
     private const string LibraryUrl = "https://embed.gog.com/user/data/games";
-    private static readonly HttpClient HttpClient = CreateHttpClient();
+    private static readonly HttpClient HttpClient = new()
+    {
+        DefaultRequestHeaders =
+        {
+            { "User-Agent", "GogGameDownloader/1.0" }
+        }
+    };
     private readonly IAuthService _authService;
 
     public GogGameLibraryService(IAuthService authService)
@@ -58,8 +64,9 @@ public class GogGameLibraryService : IGameLibraryService
             Debug.WriteLine($"Failed to parse GOG library response: {ex}");
             return [];
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"Unexpected library loading error: {ex}");
             return [];
         }
     }
@@ -172,12 +179,5 @@ public class GogGameLibraryService : IGameLibraryService
         }
 
         return null;
-    }
-
-    private static HttpClient CreateHttpClient()
-    {
-        var client = new HttpClient();
-        client.DefaultRequestHeaders.Add("User-Agent", "GogGameDownloader/1.0");
-        return client;
     }
 }
