@@ -1,0 +1,60 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GogGameDownloader.App"
+             xmlns:local="using:GogGameDownloader"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             xmlns:sukiEnums="using:SukiUI.Enums"
+             RequestedThemeVariant="Dark">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <suki:SukiTheme ThemeColor="{x:Static sukiEnums:SukiColor.Blue}" />
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Background colors -->
+            <Color x:Key="BgBase">#0D0F14</Color>
+            <Color x:Key="BgSurface">#161A23</Color>
+            <Color x:Key="BgElevated">#1E2330</Color>
+            <Color x:Key="Border">#2A2F3D</Color>
+
+            <!-- Text colors -->
+            <Color x:Key="TextPrimary">#E8EAF0</Color>
+            <Color x:Key="TextSecondary">#8B91A7</Color>
+
+            <!-- Brand -->
+            <Color x:Key="Accent">#6C63FF</Color>
+            <Color x:Key="AccentAlpha12">#1F6C63FF</Color>
+
+            <!-- Status colors -->
+            <Color x:Key="StatusDownloading">#4FC3F7</Color>
+            <Color x:Key="StatusVerified">#69F0AE</Color>
+            <Color x:Key="StatusUpdateReady">#FFD740</Color>
+            <Color x:Key="StatusError">#FF5370</Color>
+            <Color x:Key="StatusQueued">#B0BEC5</Color>
+
+            <!-- SolidColorBrush brushes for binding -->
+            <SolidColorBrush x:Key="BgBaseBrush" Color="{StaticResource BgBase}" />
+            <SolidColorBrush x:Key="BgSurfaceBrush" Color="{StaticResource BgSurface}" />
+            <SolidColorBrush x:Key="BgElevatedBrush" Color="{StaticResource BgElevated}" />
+            <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource Border}" />
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}" />
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}" />
+            <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}" />
+            <SolidColorBrush x:Key="StatusDownloadingBrush" Color="{StaticResource StatusDownloading}" />
+            <SolidColorBrush x:Key="StatusVerifiedBrush" Color="{StaticResource StatusVerified}" />
+            <SolidColorBrush x:Key="StatusUpdateReadyBrush" Color="{StaticResource StatusUpdateReady}" />
+            <SolidColorBrush x:Key="StatusErrorBrush" Color="{StaticResource StatusError}" />
+            <SolidColorBrush x:Key="StatusQueuedBrush" Color="{StaticResource StatusQueued}" />
+
+            <!-- Corner radii -->
+            <CornerRadius x:Key="CardRadius">12</CornerRadius>
+            <CornerRadius x:Key="ButtonRadius">8</CornerRadius>
+            <CornerRadius x:Key="PillRadius">20</CornerRadius>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

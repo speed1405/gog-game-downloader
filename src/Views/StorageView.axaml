@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GogGameDownloader.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="GogGameDownloader.Views.StorageView"
+             x:DataType="vm:StorageViewModel"
+             Background="{StaticResource BgBaseBrush}">
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="16">
+            <TextBlock Text="Storage"
+                       Foreground="{StaticResource TextPrimaryBrush}"
+                       FontSize="24" FontWeight="Bold"/>
+            <ItemsControl ItemsSource="{Binding Drives}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:DriveCardViewModel">
+                        <Border Background="{StaticResource BgSurfaceBrush}"
+                                CornerRadius="12"
+                                Padding="20"
+                                Margin="0,0,0,8">
+                            <Grid RowDefinitions="Auto,Auto,Auto">
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="💾" FontSize="20"/>
+                                    <TextBlock Text="{Binding Name}"
+                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                               FontSize="16" FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <ProgressBar Grid.Row="1"
+                                             Value="{Binding UsedPercent}"
+                                             Maximum="100"
+                                             Height="8"
+                                             Margin="0,12,0,8"
+                                             Foreground="{StaticResource AccentBrush}"/>
+                                <TextBlock Grid.Row="2"
+                                           Text="{Binding FreeLabel}"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="12"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

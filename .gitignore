@@ -1,0 +1,17 @@
+# .NET build artifacts
+bin/
+obj/
+
+# User settings
+*.user
+*.suo
+.vs/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
