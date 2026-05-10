@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using GogGameDownloader.Data;
 using GogGameDownloader.Services.Auth;
+using GogGameDownloader.Services.Library;
 using GogGameDownloader.ViewModels;
 using GogGameDownloader.Views;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +61,7 @@ public partial class App : Application
 
         services.AddSingleton<ISecureTokenStore, SecureTokenStore>();
         services.AddSingleton<IAuthService, OAuthPkceAuthService>();
+        services.AddSingleton<IGameLibraryService, GogGameLibraryService>();
 
         services.AddTransient<LibraryViewModel>();
         services.AddTransient<DownloadsViewModel>();
