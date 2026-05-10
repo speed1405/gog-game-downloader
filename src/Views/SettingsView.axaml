@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GogGameDownloader.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="GogGameDownloader.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel"
+             Background="{StaticResource BgBaseBrush}">
+
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="16" MaxWidth="600">
+            <TextBlock Text="Settings"
+                       Foreground="{StaticResource TextPrimaryBrush}"
+                       FontSize="24" FontWeight="Bold"/>
+
+            <Border Background="{StaticResource BgSurfaceBrush}"
+                    CornerRadius="12" Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Downloads"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="16" FontWeight="SemiBold"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding DownloadPath}"
+                                 PlaceholderText="Download path..."
+                                 Background="{StaticResource BgElevatedBrush}"
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 CornerRadius="8" Padding="12,8"/>
+                        <Button Grid.Column="1"
+                                Command="{Binding BrowseDownloadPathCommand}"
+                                Content="Browse"
+                                Margin="8,0,0,0"
+                                Background="{StaticResource BgElevatedBrush}"
+                                Foreground="{StaticResource TextPrimaryBrush}"
+                                CornerRadius="8" Padding="12,8"/>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Max concurrent downloads:"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"/>
+                        <NumericUpDown Value="{Binding MaxConcurrentDownloads}"
+                                       Minimum="1" Maximum="10"
+                                       Width="100"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Background="{StaticResource BgSurfaceBrush}"
+                    CornerRadius="12" Padding="20">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Behavior"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="16" FontWeight="SemiBold"/>
+                    <CheckBox Content="Minimize to tray"
+                              IsChecked="{Binding MinimizeToTray}"
+                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <CheckBox Content="Start with Windows"
+                              IsChecked="{Binding StartWithWindows}"
+                              Foreground="{StaticResource TextPrimaryBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <Button Command="{Binding SaveCommand}"
+                    Content="Save Settings"
+                    Background="{StaticResource AccentBrush}"
+                    Foreground="White"
+                    CornerRadius="8"
+                    Padding="16,10"
+                    HorizontalAlignment="Right"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

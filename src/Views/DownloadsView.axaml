@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GogGameDownloader.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="GogGameDownloader.Views.DownloadsView"
+             x:DataType="vm:DownloadsViewModel"
+             Background="{StaticResource BgBaseBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <Border Grid.Row="0" Padding="20,16">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Command="{Binding PauseAllCommand}"
+                        Content="Pause All"
+                        Background="{StaticResource BgElevatedBrush}"
+                        Foreground="{StaticResource TextPrimaryBrush}"
+                        CornerRadius="8" Padding="12,8"/>
+                <Button Command="{Binding ResumeAllCommand}"
+                        Content="Resume All"
+                        Background="{StaticResource AccentBrush}"
+                        Foreground="White"
+                        CornerRadius="8" Padding="12,8"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Empty state -->
+        <Border Grid.Row="1"
+                IsVisible="{Binding IsIdle}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <StackPanel Spacing="8" HorizontalAlignment="Center">
+                <TextBlock Text="⬇" FontSize="48" HorizontalAlignment="Center"/>
+                <TextBlock Text="No active downloads"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="16"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Jobs}" Margin="20">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:DownloadJobViewModel">
+                        <Border Background="{StaticResource BgSurfaceBrush}"
+                                CornerRadius="12"
+                                Padding="16"
+                                Margin="0,0,0,8">
+                            <Grid RowDefinitions="Auto,Auto,Auto">
+                                <TextBlock Grid.Row="0"
+                                           Text="{Binding Title}"
+                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                           FontWeight="Medium"/>
+                                <ProgressBar Grid.Row="1"
+                                             Value="{Binding Progress}"
+                                             Maximum="100"
+                                             Height="6"
+                                             Margin="0,8,0,4"
+                                             Foreground="{StaticResource StatusDownloadingBrush}"/>
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12">
+                                    <TextBlock Text="{Binding StatusLabel}"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               FontSize="12"/>
+                                    <TextBlock Text="{Binding SpeedLabel}"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               FontSize="12"/>
+                                    <TextBlock Text="{Binding EtaLabel}"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               FontSize="12"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

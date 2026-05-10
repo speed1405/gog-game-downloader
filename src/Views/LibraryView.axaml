@@ -1,0 +1,119 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:GogGameDownloader.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="GogGameDownloader.Views.LibraryView"
+             x:DataType="vm:LibraryViewModel"
+             Background="{StaticResource BgBaseBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Search bar -->
+        <Border Grid.Row="0" Padding="20,16">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0"
+                         Text="{Binding SearchText}"
+                         PlaceholderText="Search games..."
+                         Background="{StaticResource BgSurfaceBrush}"
+                         Foreground="{StaticResource TextPrimaryBrush}"
+                         CornerRadius="8"
+                         Padding="12,8"/>
+                <Button Grid.Column="1"
+                        Command="{Binding RefreshCommand}"
+                        Content="Refresh"
+                        Margin="8,0,0,0"
+                        Background="{StaticResource AccentBrush}"
+                        Foreground="White"
+                        CornerRadius="8"
+                        Padding="12,8"/>
+            </Grid>
+        </Border>
+
+        <!-- Empty state -->
+        <Border Grid.Row="1"
+                IsVisible="{Binding IsEmpty}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="{StaticResource BgSurfaceBrush}"
+                CornerRadius="12"
+                Padding="40,32">
+            <StackPanel Spacing="12" HorizontalAlignment="Center">
+                <TextBlock Text="📚"
+                           FontSize="48"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="Sign in to load your games"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           FontSize="18" FontWeight="SemiBold"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="Your GOG library will appear here after signing in."
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Game grid -->
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Games}" Margin="20">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:GameCardViewModel">
+                        <Border Width="180" Height="260"
+                                Margin="6"
+                                Background="{StaticResource BgSurfaceBrush}"
+                                CornerRadius="12">
+                            <Grid RowDefinitions="*,Auto">
+                                <!-- Poster placeholder -->
+                                <Border Grid.Row="0"
+                                        Background="{StaticResource BgElevatedBrush}"
+                                        CornerRadius="12,12,0,0">
+                                    <TextBlock Text="{Binding Title}"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
+                                               Margin="8"/>
+                                </Border>
+
+                                <!-- Footer -->
+                                <Border Grid.Row="1"
+                                        Padding="10,8"
+                                        Background="{StaticResource BgSurfaceBrush}"
+                                        CornerRadius="0,0,12,12">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="{Binding Title}"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   FontSize="12" FontWeight="Medium"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                            <Border Background="{StaticResource BgElevatedBrush}"
+                                                    CornerRadius="20"
+                                                    Padding="6,2">
+                                                <TextBlock Text="{Binding StatusLabel}"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           FontSize="10"/>
+                                            </Border>
+                                            <TextBlock Text="{Binding SizeLabel}"
+                                                       Foreground="{StaticResource TextSecondaryBrush}"
+                                                       FontSize="10"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <ProgressBar Value="{Binding DownloadProgress}"
+                                                     Maximum="100"
+                                                     Height="3"
+                                                     IsVisible="{Binding HasDownloadProgress}"
+                                                     Foreground="{StaticResource StatusDownloadingBrush}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

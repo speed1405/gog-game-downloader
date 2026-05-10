@@ -1,0 +1,146 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GogGameDownloader.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+        x:Class="GogGameDownloader.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="GOG Game Downloader"
+        MinWidth="800" MinHeight="600"
+        Width="1280" Height="800"
+        Background="{StaticResource BgBaseBrush}">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Top bar -->
+        <Border Grid.Row="0"
+                Background="{StaticResource BgSurfaceBrush}"
+                BorderBrush="{StaticResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="16,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="GOG Offline Backup Downloader"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           FontSize="16" FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Button Content="Sign In"
+                            IsVisible="{Binding Auth.IsAuthenticated, Converter={x:Static BoolConverters.Not}}"
+                            Command="{Binding Auth.SignInCommand}"
+                            Background="{StaticResource AccentBrush}"
+                            Foreground="White"
+                            CornerRadius="8"
+                            Padding="12,6"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8"
+                                IsVisible="{Binding Auth.IsAuthenticated}">
+                        <TextBlock Text="{Binding Auth.Username}"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   VerticalAlignment="Center"/>
+                        <Button Content="Sign Out"
+                                Command="{Binding Auth.SignOutCommand}"
+                                Background="Transparent"
+                                Foreground="{StaticResource TextSecondaryBrush}"
+                                CornerRadius="8"
+                                Padding="8,6"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main content with sidebar -->
+        <SplitView Grid.Row="1"
+                   IsPaneOpen="{Binding IsSidebarExpanded}"
+                   OpenPaneLength="220"
+                   CompactPaneLength="60"
+                   DisplayMode="CompactInline"
+                   PaneBackground="{StaticResource BgSurfaceBrush}">
+
+            <!-- Sidebar pane -->
+            <SplitView.Pane>
+                <Grid RowDefinitions="*,Auto">
+                    <StackPanel Grid.Row="0" Spacing="4" Margin="8,16">
+                        <Button Command="{Binding NavigateToCommand}"
+                                CommandParameter="Library"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Background="Transparent"
+                                Foreground="{StaticResource TextPrimaryBrush}"
+                                CornerRadius="8">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="📚" FontSize="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="Library"
+                                           IsVisible="{Binding IsSidebarExpanded}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding NavigateToCommand}"
+                                CommandParameter="Downloads"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Background="Transparent"
+                                Foreground="{StaticResource TextPrimaryBrush}"
+                                CornerRadius="8">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="⬇" FontSize="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="Downloads"
+                                           IsVisible="{Binding IsSidebarExpanded}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding NavigateToCommand}"
+                                CommandParameter="Storage"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Background="Transparent"
+                                Foreground="{StaticResource TextPrimaryBrush}"
+                                CornerRadius="8">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="💾" FontSize="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="Storage"
+                                           IsVisible="{Binding IsSidebarExpanded}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding NavigateToCommand}"
+                                CommandParameter="Settings"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                Padding="12,10"
+                                Background="Transparent"
+                                Foreground="{StaticResource TextPrimaryBrush}"
+                                CornerRadius="8">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="⚙" FontSize="16" VerticalAlignment="Center"/>
+                                <TextBlock Text="Settings"
+                                           IsVisible="{Binding IsSidebarExpanded}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Toggle button -->
+                    <Button Grid.Row="1"
+                            Command="{Binding ToggleSidebarCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Background="Transparent"
+                            Foreground="{StaticResource TextSecondaryBrush}"
+                            CornerRadius="0"
+                            Padding="8,12"
+                            Margin="0,0,0,8">
+                        <TextBlock Text="☰" FontSize="18"/>
+                    </Button>
+                </Grid>
+            </SplitView.Pane>
+
+            <!-- Content area -->
+            <Border Background="{StaticResource BgBaseBrush}" Padding="0">
+                <ContentControl Content="{Binding CurrentPage}"/>
+            </Border>
+        </SplitView>
+    </Grid>
+</Window>
