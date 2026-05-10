@@ -51,7 +51,9 @@ public partial class DriveCardViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isBackupTarget;
 
+    private const long BytesPerGigabyte = 1_073_741_824L;
+
     public double UsedPercent => TotalBytes > 0 ? (double)(TotalBytes - FreeBytes) / TotalBytes * 100 : 0;
     public double FreePercent => TotalBytes > 0 ? (double)FreeBytes / TotalBytes * 100 : 0;
-    public string FreeLabel => $"{FreeBytes / 1_073_741_824.0:F1} GB free";
+    public string FreeLabel => $"{FreeBytes / (double)BytesPerGigabyte:F1} GB free";
 }

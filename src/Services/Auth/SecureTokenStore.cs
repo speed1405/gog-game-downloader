@@ -50,8 +50,13 @@ public class SecureTokenStore : ISecureTokenStore
         return Task.CompletedTask;
     }
 
-    private string GetTokenPath(string key) =>
-        Path.Combine(_storePath, $"{key.Replace("/", "_").Replace("\\", "_")}.dat");
+    private string GetTokenPath(string key)
+    {
+        // Hash the key to ensure filesystem-safe filenames across all platforms
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(key));
+        var safeName = Convert.ToHexString(hash).ToLowerInvariant();
+        return Path.Combine(_storePath, $"{safeName}.dat");
+    }
 
     private static byte[] Encrypt(byte[] data)
     {
