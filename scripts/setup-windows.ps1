@@ -75,8 +75,18 @@ function Add-DotnetToPath {
         [string]$PathToAdd
     )
 
-    $pathEntries = @($env:PATH -split ';' | Where-Object { $_ })
-    if ($pathEntries -notcontains $PathToAdd) {
+    $normalizedPathToAdd = $PathToAdd.TrimEnd('\')
+    $pathEntries = @(
+        $env:PATH -split ';' |
+            Where-Object { $_ } |
+            ForEach-Object { $_.TrimEnd('\') }
+    )
+
+    $alreadyPresent = $pathEntries | Where-Object {
+        $_.Equals($normalizedPathToAdd, [System.StringComparison]::OrdinalIgnoreCase)
+    }
+
+    if (-not $alreadyPresent) {
         $env:PATH = "$PathToAdd;$env:PATH"
     }
 }
@@ -101,25 +111,32 @@ function Install-DotnetSdk {
     }
 
     New-Item -ItemType Directory -Force -Path $dotnetInstallDir | Out-Null
-    $installerPath = Join-Path ([System.IO.Path]::GetTempPath()) "dotnet-install.ps1"
+    $installerPath = Join-Path ([System.IO.Path]::GetTempPath()) "dotnet-install-$([Guid]::NewGuid().ToString('N')).ps1"
     try {
-        Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile $installerPath -ErrorAction Stop
-    }
-    catch {
-        throw "Failed to download dotnet-install.ps1 from https://dot.net/v1/dotnet-install.ps1. $($_.Exception.Message)"
-    }
+        try {
+            Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile $installerPath -ErrorAction Stop
+        }
+        catch {
+            throw "Failed to download dotnet-install.ps1 from https://dot.net/v1/dotnet-install.ps1. $($_.Exception.Message)"
+        }
 
-    if (-not (Test-Path $installerPath) -or (Get-Item $installerPath).Length -eq 0) {
-        throw "Downloaded dotnet-install.ps1 is missing or empty."
-    }
+        if (-not (Test-Path $installerPath) -or (Get-Item $installerPath).Length -eq 0) {
+            throw "Downloaded dotnet-install.ps1 is missing or empty."
+        }
 
-    if ($IsWindows) {
-        Unblock-File -Path $installerPath -ErrorAction SilentlyContinue
-    }
+        if ($IsWindows) {
+            Unblock-File -Path $installerPath -ErrorAction SilentlyContinue
+        }
 
-    & $installerPath -Channel $requiredDotnetChannel -InstallDir $dotnetInstallDir -NoPath
-    if ($LASTEXITCODE -ne 0) {
-        throw "Automatic .NET SDK installation failed with exit code $LASTEXITCODE."
+        & $installerPath -Channel $requiredDotnetChannel -InstallDir $dotnetInstallDir -NoPath
+        if ($LASTEXITCODE -ne 0) {
+            throw "Automatic .NET SDK installation failed with exit code $LASTEXITCODE."
+        }
+    }
+    finally {
+        if (Test-Path $installerPath) {
+            Remove-Item $installerPath -Force -ErrorAction SilentlyContinue
+        }
     }
 
     Add-DotnetToPath -PathToAdd $dotnetInstallDir
