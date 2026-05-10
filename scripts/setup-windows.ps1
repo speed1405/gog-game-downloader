@@ -11,7 +11,12 @@ if ([string]::IsNullOrWhiteSpace($localAppData)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($localAppData)) {
-    $localAppData = Join-Path $HOME ".local\share"
+    if ($IsWindows) {
+        $localAppData = Join-Path $HOME "AppData\Local"
+    }
+    else {
+        $localAppData = Join-Path $HOME ".local\share"
+    }
 }
 
 $dotnetInstallDir = Join-Path $localAppData "Microsoft\dotnet"
@@ -97,8 +102,22 @@ function Install-DotnetSdk {
 
     New-Item -ItemType Directory -Force -Path $dotnetInstallDir | Out-Null
     $installerPath = Join-Path ([System.IO.Path]::GetTempPath()) "dotnet-install.ps1"
-    Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile $installerPath
-    & powershell -NoProfile -ExecutionPolicy Bypass -File $installerPath -Channel $requiredDotnetChannel -InstallDir $dotnetInstallDir -NoPath
+    try {
+        Invoke-WebRequest -Uri "https://dot.net/v1/dotnet-install.ps1" -OutFile $installerPath -ErrorAction Stop
+    }
+    catch {
+        throw "Failed to download dotnet-install.ps1 from https://dot.net/v1/dotnet-install.ps1. $($_.Exception.Message)"
+    }
+
+    if (-not (Test-Path $installerPath) -or (Get-Item $installerPath).Length -eq 0) {
+        throw "Downloaded dotnet-install.ps1 is missing or empty."
+    }
+
+    if ($IsWindows) {
+        Unblock-File -Path $installerPath -ErrorAction SilentlyContinue
+    }
+
+    & $installerPath -Channel $requiredDotnetChannel -InstallDir $dotnetInstallDir -NoPath
     if ($LASTEXITCODE -ne 0) {
         throw "Automatic .NET SDK installation failed with exit code $LASTEXITCODE."
     }
