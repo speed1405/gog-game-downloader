@@ -272,7 +272,7 @@ AppSettings    (Key TEXT PK, Value TEXT)
 ### UI states
 - Top bar account chip:
   - Signed out -> `Sign in`
-  - Signed in -> avatar/name + menu (`Refresh Session`, `Sign Out`)
+  - Signed in -> avatar/name + menu (`Refresh session`, `Sign out`)
 - Library page when signed out:
   - Empty-state card with `Sign in to load your games`
 - Expired session banner:
