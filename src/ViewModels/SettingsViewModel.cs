@@ -18,8 +18,14 @@ public partial class SettingsViewModel : ViewModelBase
     private int _maxConcurrentDownloads = 2;
 
     [RelayCommand]
-    private void Save() { }
+    private void Save()
+    {
+        // TODO: Phase 7 — persist settings to AppSettings table via ISettingsRepository
+    }
 
     [RelayCommand]
-    private void BrowseDownloadPath() { }
+    private void BrowseDownloadPath()
+    {
+        // TODO: Phase 5 — open folder picker dialog and update DownloadPath
+    }
 }

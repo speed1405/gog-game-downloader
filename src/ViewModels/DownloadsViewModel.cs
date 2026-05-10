@@ -12,10 +12,16 @@ public partial class DownloadsViewModel : ViewModelBase
     private bool _isIdle = true;
 
     [RelayCommand]
-    private void PauseAll() { }
+    private void PauseAll()
+    {
+        // TODO: Phase 4 — pause all active download jobs via IDownloadService
+    }
 
     [RelayCommand]
-    private void ResumeAll() { }
+    private void ResumeAll()
+    {
+        // TODO: Phase 4 — resume all paused download jobs via IDownloadService
+    }
 }
 
 public partial class DownloadJobViewModel : ViewModelBase

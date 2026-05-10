@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -86,6 +87,9 @@ public class SecureTokenStore : ISecureTokenStore
         return result.ToArray();
     }
 
+    // NOTE: On Windows, tokens are wrapped with DPAPI (machine+user binding) for stronger protection.
+    // On non-Windows platforms (macOS/Linux), the AES key is stored on disk as a best-effort fallback.
+    // A future phase will integrate platform Keychain / Secret Service for full OS-level protection.
     private static byte[] GetOrCreateKey()
     {
         var keyPath = Path.Combine(
@@ -93,12 +97,33 @@ public class SecureTokenStore : ISecureTokenStore
             "GogGameDownloader", "key.dat");
 
         if (File.Exists(keyPath))
-            return File.ReadAllBytes(keyPath);
+        {
+            var raw = File.ReadAllBytes(keyPath);
+            return UnwrapKey(raw);
+        }
 
         Directory.CreateDirectory(Path.GetDirectoryName(keyPath)!);
         var key = new byte[32];
         RandomNumberGenerator.Fill(key);
-        File.WriteAllBytes(keyPath, key);
+        File.WriteAllBytes(keyPath, WrapKey(key));
         return key;
+    }
+
+    private static byte[] WrapKey(byte[] key)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return ProtectedData.Protect(key, null, DataProtectionScope.CurrentUser);
+        }
+        return key;
+    }
+
+    private static byte[] UnwrapKey(byte[] stored)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return ProtectedData.Unprotect(stored, null, DataProtectionScope.CurrentUser);
+        }
+        return stored;
     }
 }

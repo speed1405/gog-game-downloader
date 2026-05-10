@@ -24,7 +24,7 @@ public partial class LibraryViewModel : ViewModelBase
     [RelayCommand]
     private void Refresh()
     {
-        // Hydrated in later phases when API integration is added
+        // TODO: Phase 3 — fetch game catalog from GOG API and populate Games collection
     }
 }
 
