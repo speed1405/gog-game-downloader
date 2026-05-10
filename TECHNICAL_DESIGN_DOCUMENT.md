@@ -231,7 +231,56 @@ AppSettings    (Key TEXT PK, Value TEXT)
 
 ---
 
-## 7) Architecture & Dependency Injection
+## 7) Authentication & Login Flow
+
+### Login model
+- Use **OAuth 2.0 Authorization Code with PKCE** for desktop sign-in.
+- Open system browser for user authentication (no embedded credentials UI).
+- App listens on loopback redirect URI (for example: `http://127.0.0.1:<port>/callback`) to receive auth code.
+
+### First-time sign-in flow
+1. User clicks **Sign in to GOG**.
+2. App generates `code_verifier`, `code_challenge`, `state`, and `nonce`.
+3. Browser opens provider authorize URL with PKCE and requested scopes.
+4. User authenticates and approves access.
+5. Provider redirects to local callback with auth code.
+6. App exchanges auth code + verifier for access/refresh tokens.
+7. App stores tokens securely and loads the user library.
+
+### Session and token lifecycle
+- Keep access token in memory for API calls.
+- Persist refresh token in OS secure storage:
+  - Windows: Credential Manager / DPAPI-protected secret
+  - macOS: Keychain
+  - Linux: Secret Service (libsecret)
+- Refresh access token automatically before expiry.
+- On refresh failure (revoked/expired refresh token), clear session and require sign-in.
+
+### Security controls
+- Never store plaintext credentials.
+- Validate `state` and `nonce` on callback.
+- Use short-lived access tokens and least-privilege scopes.
+- Encrypt any fallback token cache if secure-store API is unavailable.
+- Redact tokens from logs and telemetry.
+
+### Logout behavior
+- User can choose:
+  - **Sign out (local):** clear in-memory + secure-store tokens.
+  - **Sign out everywhere:** local sign-out + provider revocation endpoint if available.
+- After logout, queue operations requiring auth are paused and marked `AuthRequired`.
+
+### UI states
+- Top bar account chip:
+  - Signed out -> `Sign in`
+  - Signed in -> avatar/name + menu (`Refresh Session`, `Sign Out`)
+- Library page when signed out:
+  - Empty-state card with `Sign in to load your games`
+- Expired session banner:
+  - Non-blocking warning with `Reauthenticate` action.
+
+---
+
+## 8) Architecture & Dependency Injection
 
 Pattern:
 - MVVM + DI (`Microsoft.Extensions.DependencyInjection`)
@@ -250,19 +299,21 @@ Benefits:
 
 ---
 
-## 8) Delivery Phases (Suggested)
+## 9) Delivery Phases (Suggested)
 
 1. **Foundation**
    - Avalonia shell, theme tokens, sidebar, base pages
-2. **Library UX**
+2. **Authentication**
+   - OAuth PKCE login, secure token storage, session restore/logout
+3. **Library UX**
    - Virtualized cards, lazy posters, hover actions
-3. **Downloads**
+4. **Downloads**
    - Queue model, progress overlays, status badges
-4. **Storage**
+5. **Storage**
    - Drive map UI, primary/backup assignment, thresholds
-5. **System Integration**
+6. **System Integration**
    - Tray icon, toast notifications, quick actions
-6. **Data Layer**
+7. **Data Layer**
    - SQLite schema, migrations, metadata cache, history
 
 This phased order delivers visible UX early while reducing architecture risk.
