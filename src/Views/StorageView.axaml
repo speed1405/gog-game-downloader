@@ -35,9 +35,40 @@
                                              Margin="0,12,0,8"
                                              Foreground="{StaticResource AccentBrush}"/>
                                 <TextBlock Grid.Row="2"
-                                           Text="{Binding FreeLabel}"
+                                            Text="{Binding FreeLabel}"
+                                            Foreground="{StaticResource TextSecondaryBrush}"
+                                            FontSize="12"/>
+                                <StackPanel Grid.Row="2"
+                                            Orientation="Horizontal"
+                                            Spacing="6"
+                                            HorizontalAlignment="Right">
+                                    <Border Background="{StaticResource BgElevatedBrush}"
+                                            CornerRadius="20"
+                                            Padding="6,2"
+                                            IsVisible="{Binding IsPrimary}">
+                                        <TextBlock Text="Primary"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   FontSize="10"/>
+                                    </Border>
+                                    <Border Background="{StaticResource BgElevatedBrush}"
+                                            CornerRadius="20"
+                                            Padding="6,2"
+                                            IsVisible="{Binding IsBackupTarget}">
+                                        <TextBlock Text="Backup"
+                                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                                   FontSize="10"/>
+                                    </Border>
+                                </StackPanel>
+                                <TextBlock Grid.Row="2"
+                                           Text="{Binding GogUsedLabel}"
                                            Foreground="{StaticResource TextSecondaryBrush}"
-                                           FontSize="12"/>
+                                           FontSize="12"
+                                           Margin="0,18,0,0"/>
+                                <TextBlock Grid.Row="2"
+                                           Text="{Binding SpaceStateLabel}"
+                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                           FontSize="11"
+                                           Margin="0,34,0,0"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
