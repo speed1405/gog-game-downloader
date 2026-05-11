@@ -27,7 +27,7 @@ Invoke-Dotnet @(
     "$repoRoot\src\GogGameDownloader.csproj",
     "-c", "Release",
     "-r", "win-x64",
-    "--self-contained", "false",
+    "--self-contained", "true",
     "-o", $publishDir
 )
 
