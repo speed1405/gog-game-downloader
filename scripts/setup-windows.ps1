@@ -5,21 +5,8 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $repoRoot = Resolve-Path (Join-Path $scriptDir "..")
 $requiredDotnetMajor = 10
 $requiredDotnetChannel = "$requiredDotnetMajor.0"
-$localAppData = $env:LOCALAPPDATA
-if ([string]::IsNullOrWhiteSpace($localAppData)) {
-    $localAppData = [Environment]::GetFolderPath([System.Environment+SpecialFolder]::LocalApplicationData)
-}
 
-if ([string]::IsNullOrWhiteSpace($localAppData)) {
-    if ($IsWindows) {
-        $localAppData = Join-Path $HOME "AppData\Local"
-    }
-    else {
-        $localAppData = Join-Path $HOME ".local\share"
-    }
-}
-
-$dotnetInstallDir = Join-Path $localAppData "Microsoft\dotnet"
+$dotnetInstallDir = Join-Path $repoRoot ".dotnet"
 $script:dotnetCommand = $null
 
 function Invoke-Dotnet {
@@ -107,7 +94,10 @@ function Install-DotnetSdk {
             return
         }
 
-        Write-Warning "winget install failed with exit code $LASTEXITCODE. Falling back to dotnet-install.ps1."
+        Write-Warning "winget install failed with exit code $LASTEXITCODE. Falling back to dotnet-install.ps1 (installing into $dotnetInstallDir)."
+    }
+    else {
+        Write-Host "winget not found. Using dotnet-install.ps1 (installing into $dotnetInstallDir)."
     }
 
     New-Item -ItemType Directory -Force -Path $dotnetInstallDir | Out-Null
