@@ -12,7 +12,7 @@ echo "Publishing linux-x64 build..."
 dotnet publish "${REPO_ROOT}/src/GogGameDownloader.csproj" \
   -c Release \
   -r linux-x64 \
-  --self-contained false \
+  --self-contained true \
   -o "${PUBLISH_DIR}"
 
 echo "Installing to ${INSTALL_DIR}..."
